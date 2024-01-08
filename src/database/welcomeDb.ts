@@ -1,36 +1,36 @@
-import { db } from "./connect.ts";
+import sqlite3 from 'sqlite3';
 import { SettingsSchema } from "../core/interfaces.ts";
 
-const settings = db.collection<SettingsSchema>("CHAT_SETTINGS");
+// Access the default database connection
+const db = require('./connect.ts').default;
+
+// Use the table name directly
+// const settings = db.collection<SettingsSchema>("CHAT_SETTINGS");
 
 export async function setWelcome(chatID: number, welcome: string) {
-  const chat = await settings.findOne({ chatID: chatID });
-  if (!chat) {
-    await settings.insertOne({
-      chatID: chatID,
-      status: true,
-      welcome: welcome,
-    });
+  const chat = await db.get('SELECT * FROM CHAT_SETTINGS WHERE chatID = ?', [chatID]);
+  if (!chat.values.length) {
+    await db.run('INSERT INTO CHAT_SETTINGS (chatID, status, welcome) VALUES (?, ?, ?)', [chatID, true, welcome]);
     return;
   }
-  await settings.updateOne({ chatID: chatID }, { $set: { welcome: welcome } });
+  await db.run('UPDATE CHAT_SETTINGS SET welcome = ? WHERE chatID = ?', [welcome, chatID]);
 }
 
 export async function setStatus(chatID: number, status: boolean) {
-  const chat = await settings.findOne({ chatID: chatID });
-  if (!chat) {
-    await settings.insertOne({ chatID: chatID, status: status, welcome: "" });
+  const chat = await db.get('SELECT * FROM CHAT_SETTINGS WHERE chatID = ?', [chatID]);
+  if (!chat.values.length) {
+    await db.run('INSERT INTO CHAT_SETTINGS (chatID, status, welcome) VALUES (?, ?, ?)', [chatID, status, ""]);
     return;
   }
-  await settings.updateOne({ chatID: chatID }, { $set: { status: status } });
+  await db.run('UPDATE CHAT_SETTINGS SET status = ? WHERE chatID = ?', [status, chatID]);
 }
 
 export async function getSettings(chatID: number) {
-  const chatsetting = await settings.find({ chatID: chatID }).toArray();
-  return chatsetting[0] ?? null;
+  const chatsetting = await db.get('SELECT * FROM CHAT_SETTINGS WHERE chatID = ?', [chatID]);
+  return chatsetting.values[0] ?? null; // Return the first result or null
 }
 
 export async function getAllSettings() {
-  const chatsetting = await settings.find({}).toArray();
-  return chatsetting;
+  const chatsettings = await db.all('SELECT * FROM CHAT_SETTINGS');
+  return chatsettings.map((row) => row.values); // Extract values from each row
 }

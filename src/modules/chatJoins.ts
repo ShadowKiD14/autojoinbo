@@ -12,7 +12,20 @@ composer.on("chat_join_request", async (ctx) => {
   const settings = await getSettings(update.chat.id);
   let approve_or_not, welcome;
   const def_welcome_approve =
-    "Hey {name}, your request to join {chat} has been approved!";
+    `✅🔞 All Channel 🔞✅
+
+⏬⬇️ BACKUP CHANNEL ⬇️⏬
+🔥 https://t.me/backup_wallah 🔥
+
+✅🔞 All Private Channels 🔞✅
+🔥 https://t.me/Oyo_room_leaked_viral_videos_bot 🔥
+
+🔥 https://t.me/+YSo-jCnTz6E5MzE1 🔥
+
+🔥 https://t.me/Desi_viral_hindi_mms_videos_xbot 🔥
+
+🔥 https://t.me/+yrPJwAqKC8dkY2Rl 🔥
+`;
   const def_welcome_decline =
     "Hey {name}, your request to join {chat} has been declined!";
 

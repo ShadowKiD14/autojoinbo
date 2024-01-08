@@ -22,7 +22,7 @@ composer
       reply_markup: new InlineKeyboard()
         .text(ctx.t("usage-help"), "helper")
         .text("Language 🌐", "setLang").row()
-        .url(ctx.t("updates"), "https://t.me/BotzHub"),
+        .url(ctx.t("updates"), "https://t.me/backup_wallah"),
       disable_web_page_preview: true,
     });
     await addUser(ctx.from!.id);
