@@ -1,26 +1,29 @@
-import sqlite3 from 'sqlite3';
+import { db } from "./connect.ts";
 import { UserSchema } from "../core/interfaces.ts";
 
-// Use the default database connection from connect.ts
-const db = require('./connect.ts').default;
-
-// No need for a collection variable, directly use the table name
-// export const users = db.collection<UserSchema>("BOTUSERS");
+export const users = db.collection<UserSchema>("BOTUSERS");
 
 export async function addUser(userId: number) {
-  await db.run('INSERT INTO BOTUSERS (userID) VALUES (?)', [userId]);
+  const user = await users.findOne({ userID: userId });
+  if (user) return;
+  await users.insertOne({ userID: userId });
 }
 
 export async function removeUser(userId: number) {
-  await db.run('DELETE FROM BOTUSERS WHERE userID = ?', [userId]);
+  const user = await users.findOne({ userID: userId });
+  if (!user) return;
+  await users.deleteOne({ userID: userId });
 }
 
 export async function countUsers() {
-  const count = await db.get('SELECT COUNT(*) FROM BOTUSERS WHERE userID <> 0');
-  return count.values[0]; // Extract the count value
+  const count = await users.countDocuments({ userID: { $ne: 0 } });
+  return count;
 }
 
 export async function addAll(usrs: number[]) {
-  const values = usrs.map((user) => [user]); // Prepare values for bulk insertion
-  await db.run('INSERT INTO BOTUSERS (userID) VALUES (?)', values);
+  const a = [];
+  for (const user of usrs) {
+    a.push({ userID: user });
+  }
+  await users.insertMany(a);
 }
